@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import Moveable from "react-moveable";
+import Moveable, { MoveableManagerInterface, Renderer } from "react-moveable";
 
 const App = () => {
     const imgApi = "https://jsonplaceholder.typicode.com/photos";
@@ -17,6 +17,16 @@ const App = () => {
                 setImages(data);
             });
     }, []);
+
+    const deleteSelection = () => {
+        let deleteElement = document.getElementsByClassName("selectedItem");
+        if (deleteElement.length == 0) {
+          return;
+        }
+        while(deleteElement.length > 0){
+          deleteElement[0].parentNode.removeChild(deleteElement[0]);
+      }
+    };
 
     const addMoveable = () => {
         // Create a new moveable component and add it to the array
@@ -75,6 +85,7 @@ const App = () => {
     return (
         <main style={{ height: "100vh", width: "100vw" }}>
             <button onClick={addMoveable}>Add Moveable1</button>
+            <button onClick={deleteSelection}>Delete selection</button>
             <div
                 id="parent"
                 style={{
@@ -214,8 +225,12 @@ const Component = ({
         <>
             <div
                 ref={ref}
-                className="draggable"
                 id={"component-" + id}
+                className={
+                    isSelected && ref.current
+                        ? "draggable selectedItem"
+                        : "draggable notSelected"
+                }
                 style={{
                     position: "absolute",
                     top: top,
@@ -226,13 +241,16 @@ const Component = ({
                     backgroundImage: backgroundImage,
                     backgroundSize: backgroundSize,
                     backgroundPosition: "center",
-                    backgroundRepeat: 'no-repeat'
+                    backgroundRepeat: "no-repeat",
                 }}
                 onClick={() => setSelected(id)}
             />
 
             <Moveable
                 target={isSelected && ref.current}
+                className={
+                    isSelected && ref.current ? "selectedItem" : "notSelected"
+                }
                 resizable
                 draggable
                 onDrag={(e) => {

@@ -6,18 +6,24 @@ const App = () => {
 
     const [moveableComponents, setMoveableComponents] = useState([]);
     const [selected, setSelected] = useState(null);
+    const [images, setImages] = useState(null);
+    const [count, setCount] = useState(0);
 
     useEffect(() => {
         fetch(imgApi)
             .then((response) => response.json())
             .then((data) => {
-              console.log(data)
+                console.log(data[0].url);
+                setImages(data);
             });
     }, []);
 
     const addMoveable = () => {
         // Create a new moveable component and add it to the array
         const COLORS = ["red", "blue", "yellow", "green", "purple"];
+        const FITS = ["cover", "contain"];
+
+        setCount(count + 1);
 
         setMoveableComponents([
             ...moveableComponents,
@@ -27,8 +33,10 @@ const App = () => {
                 left: 0,
                 width: 100,
                 height: 100,
-                color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                // color: COLORS[Math.floor(Math.random() * COLORS.length)],
                 updateEnd: true,
+                backgroundImage: `url(${images[count].url})`,
+                backgroundSize: FITS[Math.floor(Math.random() * FITS.length)],
             },
         ]);
     };
@@ -107,6 +115,8 @@ const Component = ({
     setSelected,
     isSelected = false,
     updateEnd,
+    backgroundImage,
+    backgroundSize,
 }) => {
     const ref = useRef();
 
@@ -142,6 +152,8 @@ const Component = ({
             width: newWidth,
             height: newHeight,
             color,
+            backgroundImage,
+            backgroundSize,
         });
 
         // ACTUALIZAR NODO REFERENCIA
@@ -178,19 +190,21 @@ const Component = ({
 
         const { lastEvent } = e;
         const { drag } = lastEvent;
-        const { beforeTranslate } = drag;
+        // const { beforeTranslate } = drag;
 
-        const absoluteTop = top + beforeTranslate[1];
-        const absoluteLeft = left + beforeTranslate[0];
+        // const absoluteTop = top + beforeTranslate[1];
+        // const absoluteLeft = left + beforeTranslate[0];
 
         updateMoveable(
             id,
             {
-                top: absoluteTop,
-                left: absoluteLeft,
+                top: top,
+                left: left,
                 width: newWidth,
                 height: newHeight,
                 color,
+                backgroundImage,
+                backgroundSize,
             },
             true
         );
@@ -209,6 +223,10 @@ const Component = ({
                     width: width,
                     height: height,
                     background: color,
+                    backgroundImage: backgroundImage,
+                    backgroundSize: backgroundSize,
+                    backgroundPosition: "center",
+                    backgroundRepeat: 'no-repeat'
                 }}
                 onClick={() => setSelected(id)}
             />
@@ -224,6 +242,8 @@ const Component = ({
                         width,
                         height,
                         color,
+                        backgroundImage,
+                        backgroundSize,
                     });
                 }}
                 onResize={onResize}

@@ -2,8 +2,18 @@ import React, { useRef, useState, useEffect } from "react";
 import Moveable from "react-moveable";
 
 const App = () => {
+    const imgApi = "https://jsonplaceholder.typicode.com/photos";
+
     const [moveableComponents, setMoveableComponents] = useState([]);
     const [selected, setSelected] = useState(null);
+
+    useEffect(() => {
+        fetch(imgApi)
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data)
+            });
+    }, []);
 
     const addMoveable = () => {
         // Create a new moveable component and add it to the array
@@ -64,6 +74,8 @@ const App = () => {
                     background: "black",
                     height: "80vh",
                     width: "80vw",
+                    display: "flex",
+                    overflow: "scroll",
                 }}
             >
                 {moveableComponents.map((item, index) => (
